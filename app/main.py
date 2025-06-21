@@ -97,8 +97,8 @@ class Scanner:
                         err = Err.UNTERMINATED_STRING
                         char = len(line)  # end loop
                 elif token_str.isdigit():
-                    type, literal = self.scan_nums(line[char:])
-                    token_str = str(float(literal))
+                    type, token_str = self.scan_nums(line[char:])
+                    literal = str(float(token_str))
                     char += len(literal)
 
                 elif token_str not in self.lexmes:
