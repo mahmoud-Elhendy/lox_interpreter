@@ -99,7 +99,7 @@ class Scanner:
                 elif token_str.isdigit():
                     type, token_str = self.scan_nums(line[char:])
                     literal = str(float(token_str))
-                    char += len(literal)
+                    char += len(token_str) - 1
 
                 elif token_str not in self.lexmes:
                     self.ret = 65
