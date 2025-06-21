@@ -55,7 +55,7 @@ class Scanner:
                 token_str: str = line[char]
                 # handle operators
                 if token_str == '=' and char + 1 < len(line):
-                    if line[char + 1] == '=' or line[char + 1] == '>' or line[char + 1] == '<':
+                    if line[char + 1] == '=':
                         char += 1
                         token_str += line[char]
                 elif token_str == '!' and char + 1 < len(line):
