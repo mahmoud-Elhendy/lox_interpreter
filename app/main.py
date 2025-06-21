@@ -100,7 +100,9 @@ class Scanner:
                     type, token_str = self.scan_nums(line[char:])
                     literal = str(float(token_str))
                     char += len(token_str) - 1
-
+                elif self.is_id_start(token_str):
+                    type, token_str = self.scan_id(line[char:])
+                    char += len(token_str) - 1
                 elif token_str not in self.lexmes:
                     self.ret = 65
                     err = Err.UNEXPECTED_CHAR
@@ -116,6 +118,25 @@ class Scanner:
             return ('STRING', line[:end])
         else:
             return None
+
+    def is_id_start(self, c: str) -> bool:
+        if c.isalpha() or c == '_':
+            return True
+        return False
+
+    def is_valid_id_char(self, c: str) -> bool:
+        if c.isalpha() or c == '_' or c.isdigit():
+            return True
+        return False
+
+    def scan_id(self, line: str) -> tuple[str, str]:
+        end = 1
+        for c in line[1:]:
+            if self.is_valid_id_char(c):
+                end += 1
+            else:
+                break
+        return 'IDENTIFIER', line[0:end]
 
     def scan_nums(self, line: str) -> tuple[str, str]:
         i = 1
