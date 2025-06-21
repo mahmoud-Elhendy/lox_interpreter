@@ -95,6 +95,7 @@ class Scanner:
                     else:
                         self.ret = 65
                         err = Err.UNTERMINATED_STRING
+                        char = len(line)  # end loop
                 elif token_str not in self.lexmes:
                     self.ret = 65
                     err = Err.UNEXPECTED_CHAR
