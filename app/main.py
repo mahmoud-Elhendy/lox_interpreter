@@ -17,7 +17,7 @@ class Scanner:
         self.tokens: list[Token] = list()
         self.line: int = 0
         self.lexmes: dict[str, str] = {
-            '(': 'LEFT_PAREN', ')': 'RIGHT_PAREN', '{': 'LEFT_BRACE', '}': 'RIGHT_BRACE', '*': 'STAR', '.': 'DOT', ',': 'COMMA', '+': 'PLUS'}
+            '(': 'LEFT_PAREN', ')': 'RIGHT_PAREN', '{': 'LEFT_BRACE', '}': 'RIGHT_BRACE', '*': 'STAR', '.': 'DOT', ',': 'COMMA', '+': 'PLUS', '-': 'MINUS'}
 
     def scan(self) -> None:
         for line in self.content:
