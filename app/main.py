@@ -96,6 +96,11 @@ class Scanner:
                         self.ret = 65
                         err = Err.UNTERMINATED_STRING
                         char = len(line)  # end loop
+                elif token_str.isdigit():
+                    type, literal = self.scan_nums(line[char:])
+                    token_str = str(float(literal))
+                    char += len(literal)
+
                 elif token_str not in self.lexmes:
                     self.ret = 65
                     err = Err.UNEXPECTED_CHAR
@@ -111,6 +116,20 @@ class Scanner:
             return ('STRING', line[:end])
         else:
             return None
+
+    def scan_nums(self, line: str) -> tuple[str, str]:
+        i = 1
+        num: str = line[0]
+        first_dot = True
+        while i < len(line):
+            if line[i].isdigit() or (line[i] == '.' and first_dot):
+                if line[i] == '.':
+                    first_dot = False
+                num += line[i]
+            else:
+                break
+            i += 1
+        return 'NUMBER', num
 
     def tokenize(self, lexme: str, line: int, type: str = '', literal: str = '', err: Err = Err.NONE) -> Token:
         literal = literal if literal else 'null'
