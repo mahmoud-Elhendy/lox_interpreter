@@ -38,6 +38,7 @@ class Scanner:
             ';': 'SEMICOLON',
             '/': 'SLASH',
             '=': 'EQUAL',
+            '!': 'BANG',
             "!=": "BANG_EQUAL",
             "==": "EQUAL_EQUAL",
             "<=": "LESS_EQUAL",
