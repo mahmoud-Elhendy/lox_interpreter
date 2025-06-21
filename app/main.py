@@ -66,6 +66,9 @@ class Scanner:
                     if line[char + 1] == '=':
                         char += 1
                         token_str += line[char]
+                elif token_str == '/' and char + 1 < len(line) and line[char + 1] == '/':
+                    # // comment -> skip the rest of line
+                    break
 
                 self.add_token(self.tokenize(token_str, self.line))
                 char += 1
