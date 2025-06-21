@@ -1,6 +1,40 @@
 import sys
 
 
+class Token:
+    def __init__(self, type: str, lexme: str, literal: str) -> None:
+        self.type = type
+        self.lexme = lexme
+        self.literal = literal
+
+    def __str__(self) -> str:
+        return f'{self.type} {self.lexme} {self.literal}'
+
+
+class Scanner:
+    def __init__(self, content: list[str]) -> None:
+        self.content: list[str] = content
+        self.tokens: list[Token] = list()
+        self.line: int = 0
+
+    def scan(self) -> None:
+        for line in self.content:
+            self.line += 1
+            for lexme in line:
+                self.add_token(self.tokenize(lexme))
+
+    def tokenize(self, lexme: str) -> Token:
+        lexme_type = ''
+        if lexme == '(':
+            lexme_type = 'LEFT_PAREN'
+        elif lexme == ')':
+            lexme_type = 'RIGHT_PAREN'
+        return Token(lexme_type, lexme, 'null')
+
+    def add_token(self, token: Token) -> None:
+        self.tokens.append(token)
+
+
 def main():
     if len(sys.argv) < 3:
         print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
@@ -14,15 +48,17 @@ def main():
         exit(1)
 
     with open(filename) as file:
-        file_contents = file.read()
-
-    # You can use print statements as follows for debugging, they'll be visible when running tests.
-    print("Logs from your program will appear here!", file=sys.stderr)
+        file_contents = file.readlines()
 
     if file_contents:
-        raise NotImplementedError("Scanner not implemented")
+        s = Scanner(file_contents)
+        s.scan()
+        for t in s.tokens:
+            print(t)
+        print("EOF  null")
     else:
-        print("EOF  null") # Placeholder, replace this line when implementing the scanner
+        # Placeholder, replace this line when implementing the scanner
+        print("EOF  null")
 
 
 if __name__ == "__main__":
