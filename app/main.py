@@ -26,14 +26,48 @@ class Scanner:
         self.tokens: list[Token] = list()
         self.line: int = 0
         self.lexmes: dict[str, str] = {
-            '(': 'LEFT_PAREN', ')': 'RIGHT_PAREN', '{': 'LEFT_BRACE', '}': 'RIGHT_BRACE', '*': 'STAR', '.': 'DOT', ',': 'COMMA', '+': 'PLUS', '-': 'MINUS', ';': 'SEMICOLON', '/': 'SLASH'}
+            '(': 'LEFT_PAREN',
+            ')': 'RIGHT_PAREN',
+            '{': 'LEFT_BRACE',
+            '}': 'RIGHT_BRACE',
+            '*': 'STAR',
+            '.': 'DOT',
+            ',': 'COMMA',
+            '+': 'PLUS',
+            '-': 'MINUS',
+            ';': 'SEMICOLON',
+            '/': 'SLASH',
+            '=': 'EQUAL',
+            "!=": "BANG_EQUAL",
+            "==": "EQUAL_EQUAL",
+            "<=": "LESS_EQUAL",
+            ">=": "GREATER_EQUAL",
+            "<": "LESS",
+            ">": "GREATER"}
         self.ret: int = 0
 
     def scan(self) -> None:
         for line in self.content:
             self.line += 1
-            for lexme in line:
-                self.add_token(self.tokenize(lexme, self.line))
+            char = 0
+            while char < len(line):
+                token_str: str = line[char]
+                # handle operators
+                if token_str == '=' and char + 1 < len(line):
+                    if line[char + 1] == '=' or line[char + 1] == '>' or line[char + 1] == '<':
+                        char += 1
+                        token_str += line[char]
+                elif token_str == '!' and char + 1 < len(line):
+                    if line[char + 1] == '=':
+                        char += 1
+                        token_str += line[char]
+                elif (token_str == '>' or token_str == '<') and char + 1 < len(line):
+                    if line[char + 1] == '=':
+                        char += 1
+                        token_str += line[char]
+
+                self.add_token(self.tokenize(token_str, self.line))
+                char += 1
         self.add_token(Token('EOF', '', 'null', self.line + 1))
 
     def tokenize(self, lexme: str, line: int) -> Token:
