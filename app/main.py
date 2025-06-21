@@ -53,6 +53,9 @@ class Scanner:
             char = 0
             while char < len(line):
                 token_str: str = line[char]
+                if token_str.isspace():
+                    char += 1
+                    continue
                 # handle operators
                 if token_str == '=' and char + 1 < len(line):
                     if line[char + 1] == '=':
