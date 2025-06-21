@@ -15,7 +15,7 @@ class Token:
     def display(self):
         if self.err:
             print(
-                f'[Line {self.line}] Error: Unexpected character: {self.lexme}', file=sys.stderr)
+                f'[line {self.line}] Error: Unexpected character: {self.lexme}', file=sys.stderr)
         else:
             print(self)
 
