@@ -17,13 +17,14 @@ class Scanner:
         self.tokens: list[Token] = list()
         self.line: int = 0
         self.lexmes: dict[str, str] = {
-            '(': 'LEFT_PAREN', ')': 'RIGHT_PAREN', '{': 'LEFT_BRACE', '}': 'RIGHT_BRACE'}
+            '(': 'LEFT_PAREN', ')': 'RIGHT_PAREN', '{': 'LEFT_BRACE', '}': 'RIGHT_BRACE', '*': 'STAR', '.': 'DOT', ',': 'COMMA', '+': 'PLUS'}
 
     def scan(self) -> None:
         for line in self.content:
             self.line += 1
             for lexme in line:
                 self.add_token(self.tokenize(lexme))
+        self.add_token(Token('EOF', '', 'null'))
 
     def tokenize(self, lexme: str) -> Token:
         lexme_type: str = self.lexmes[lexme] if lexme in self.lexmes else ''
@@ -53,7 +54,6 @@ def main():
         s.scan()
         for t in s.tokens:
             print(t)
-        print("EOF  null")
     else:
         # Placeholder, replace this line when implementing the scanner
         print("EOF  null")
