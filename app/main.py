@@ -55,7 +55,24 @@ class Scanner:
             "<=": "LESS_EQUAL",
             ">=": "GREATER_EQUAL",
             "<": "LESS",
-            ">": "GREATER"}
+            ">": "GREATER",
+            "and":    "AND",
+            "class":  "CLASS",
+            "else":   "ELSE",
+            "false":  "FALSE",
+            "for":    "FOR",
+            "fun":    "FUN",
+            "if":     "IF",
+            "nil":    "NIL",
+            "or":     "OR",
+            "print":  "PRINT",
+            "return": "RETURN",
+            "super":  "SUPER",
+            "this":   "THIS",
+            "true":   "TRUE",
+            "var":    "VAR",
+            "while":  "WHILE"
+        }
         self.ret: int = 0
 
     def scan(self) -> None:
@@ -101,7 +118,7 @@ class Scanner:
                     literal = str(float(token_str))
                     char += len(token_str) - 1
                 elif self.is_id_start(token_str):
-                    type, token_str = self.scan_id(line[char:])
+                    type, token_str = self.scan_id_keywords(line[char:])
                     char += len(token_str) - 1
                 elif token_str not in self.lexmes:
                     self.ret = 65
@@ -129,14 +146,17 @@ class Scanner:
             return True
         return False
 
-    def scan_id(self, line: str) -> tuple[str, str]:
+    def scan_id_keywords(self, line: str) -> tuple[str, str]:
         end = 1
+        type: str = 'IDENTIFIER'
         for c in line[1:]:
             if self.is_valid_id_char(c):
                 end += 1
             else:
                 break
-        return 'IDENTIFIER', line[0:end]
+        if line[0:end] in self.lexmes:
+            type = self.lexmes[line[0:end]]
+        return type, line[0:end]
 
     def scan_nums(self, line: str) -> tuple[str, str]:
         i = 1
