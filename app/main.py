@@ -19,11 +19,10 @@ def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
 
-    # Uncomment this block to pass the first stage
-    # if file_contents:
-    #     raise NotImplementedError("Scanner not implemented")
-    # else:
-    #     print("EOF  null") # Placeholder, replace this line when implementing the scanner
+    if file_contents:
+        raise NotImplementedError("Scanner not implemented")
+    else:
+        print("EOF  null") # Placeholder, replace this line when implementing the scanner
 
 
 if __name__ == "__main__":
