@@ -16,6 +16,8 @@ class Scanner:
         self.content: list[str] = content
         self.tokens: list[Token] = list()
         self.line: int = 0
+        self.lexmes: dict[str, str] = {
+            '(': 'LEFT_PAREN', ')': 'RIGHT_PAREN', '{': 'LEFT_BRACE', '}': 'RIGHT_BRACE '}
 
     def scan(self) -> None:
         for line in self.content:
@@ -24,11 +26,7 @@ class Scanner:
                 self.add_token(self.tokenize(lexme))
 
     def tokenize(self, lexme: str) -> Token:
-        lexme_type = ''
-        if lexme == '(':
-            lexme_type = 'LEFT_PAREN'
-        elif lexme == ')':
-            lexme_type = 'RIGHT_PAREN'
+        lexme_type: str = self.lexmes[lexme] if lexme in self.lexmes else ''
         return Token(lexme_type, lexme, 'null')
 
     def add_token(self, token: Token) -> None:
