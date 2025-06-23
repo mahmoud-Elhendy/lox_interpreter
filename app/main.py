@@ -309,8 +309,12 @@ class Parser:
         return self.primary()
 
     def primary(self) -> Expr:
-        if token := self.match('TRUE', 'FALSE', 'NIL'):
-            return Literal(token.lexme)
+        if token := self.match('TRUE'):
+            return Literal(True)
+        elif token := self.match('FALSE'):
+            return Literal(False)
+        elif token := self.match('NIL'):
+            return Literal(None)
         elif token := self.match('NUMBER', 'STRING'):
             return Literal(token.literal)
         elif self.match('LEFT_PAREN'):
@@ -331,9 +335,9 @@ def evaluate(expression: Expr) -> Any:
         return (expression.value)
 
     elif isinstance(expression, Binary):
-        op = expression.op
-        left = expression.lexpr
-        right = expression.rexpr
+        op: str = expression.op
+        left: Expr = expression.lexpr
+        right: Expr = expression.rexpr
         if op == '+':
             return evaluate(left) + evaluate(right)
         if op == '-':
@@ -344,9 +348,25 @@ def evaluate(expression: Expr) -> Any:
             return evaluate(left) / evaluate(right)
     elif isinstance(expression, Grouping):
         return evaluate(expression.expr)
+    elif isinstance(expression, Unary):
+        op = expression.op
+        expr = evaluate(expression.expr)
+        if op == '!':
+            if isinstance(expr, float) and expr > 0:
+                return False
+            if isinstance(expr, float) and expr == 0.0:
+                return True  # not sure about this behaviour yet
+            return not (expr)
+        elif op == '-':
+            if isinstance(expr, float):
+                return -expr
 # f(B(B(1+2)*B(5-3)))
 #  └──f(B(1+2)) * f(B(5-3))
 #           └── 3 * 2
+
+# f(!!12)
+#  └──!f(!12)
+#           └── !f(12)
 
 
 def main() -> None:
