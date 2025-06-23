@@ -317,7 +317,9 @@ class Parser:
             expr: Expr = self.expression()
             self.match('RIGHT_PAREN')
             return Grouping(expr)
-        raise SyntaxError("Expected literal or (expr)")
+        token = self.peek()
+        raise SyntaxError(
+            f"[line {token.line}] Error at '{token.lexme}': Expect expression.")
 
     def parse(self) -> Expr:
         return self.expression()
@@ -353,7 +355,11 @@ def main() -> None:
             s = Scanner(file_contents)
             s.scan()
             p = Parser(s.tokens)
-            ast = p.parse()
+            try:
+                ast = p.parse()
+            except SyntaxError as e:
+                print(e, file=sys.stderr)
+                sys.exit(65)
             out = print_ast(ast)
             print(out)
     else:
