@@ -1,7 +1,7 @@
 import sys
 
 from enum import Enum, auto
-from parser import *
+from RDParser import *
 
 
 class Err(Enum):
