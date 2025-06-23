@@ -175,7 +175,7 @@ class Scanner:
         return 'NUMBER', num
 
     def tokenize(self, lexme: str, line: int, type: str = '', literal: Any = '', err: Err = Err.NONE) -> Token:
-        literal = literal if literal else 'null'
+        literal = literal if literal != '' else 'null'
         if not type and lexme in self.lexmes:
             type = self.lexmes[lexme]
         return Token(type, lexme, literal, line, err=err)
