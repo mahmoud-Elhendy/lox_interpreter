@@ -1,6 +1,6 @@
 # test_my_math.py
 import unittest
-from parser import *
+from RDParser import *
 from main import Token
 from AST import *
 

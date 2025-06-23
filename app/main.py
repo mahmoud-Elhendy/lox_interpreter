@@ -265,21 +265,48 @@ class Parser:
         self.current += 1
         return tok
 
-    def expression(self) -> Expr:
-        return self.term()
-
     def match(self, *types: str) -> Token | None:
         kind = self.peek().type
         if kind in types:
             return self.advance()
         return None
 
-    def term(self) -> Expr:
-        expr: Expr = self.primary()
-        while (token := self.match("PLUS", "MINUS")):
-            right = self.primary()
+    def expression(self) -> Expr:
+        return self.equality()
+
+    def equality(self) -> Expr:
+        expr = self.comparison()
+        while (token := self.match("BANG_EQUAL", "EQUAL_EQUAL")):
+            right = self.comparison()
             expr = Binary(expr, right, token.lexme)
         return expr
+
+    def comparison(self) -> Expr:
+        expr = self.term()
+        while (token := self.match("LESS_EQUAL", "GREATER_EQUAL", "LESS", "GREATER")):
+            right = self.term()
+            expr = Binary(expr, right, token.lexme)
+        return expr
+
+    def term(self) -> Expr:
+        expr: Expr = self.factor()
+        while (token := self.match("PLUS", "MINUS")):
+            right = self.factor()
+            expr = Binary(expr, right, token.lexme)
+        return expr
+
+    def factor(self) -> Expr:
+        expr: Expr = self.unary()
+        while (token := self.match("SLASH", "STAR")):
+            right = self.unary()
+            expr = Binary(expr, right, token.lexme)
+        return expr
+
+    def unary(self) -> Expr:
+        if token := self.match("BANG", "MINUS"):
+            right = self.unary()
+            return Unary(token.lexme, right)
+        return self.primary()
 
     def primary(self) -> Expr:
         if token := self.match('TRUE', 'FALSE', 'NIL'):
