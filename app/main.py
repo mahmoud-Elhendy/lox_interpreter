@@ -1,7 +1,8 @@
+from dataclasses import dataclass
+from typing import Any
 import sys
 
 from enum import Enum, auto
-from RDParser import *
 
 
 class Err(Enum):
@@ -187,6 +188,111 @@ def scan(file_contents: list[str]) -> Scanner:
     s = Scanner(file_contents)
     s.scan()
     return s
+
+# expression     → literal
+#                | unary
+#                | binary
+#                | grouping ;
+
+# literal        → NUMBER | STRING | "true" | "false" | "nil" ;
+# grouping       → "(" expression ")" ;
+# unary          → ( "-" | "!" ) expression ;
+# binary         → expression operator expression ;
+# operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
+#                | "+"  | "-"  | "*" | "/" ;
+
+# Note: Literal is an expression but op not expression
+
+
+class Expr:
+    pass
+
+
+@dataclass
+class Literal(Expr):
+    value: Any
+
+
+@dataclass
+class Grouping(Expr):
+    expr: Expr
+
+
+@dataclass
+class Unary(Expr):
+    op: str
+    expr: Expr
+
+
+@dataclass
+class Binary(Expr):
+    lexpr: Expr
+    rexpr: Expr
+    op: str
+
+
+def print_ast(expr: Expr) -> str | None:
+    if isinstance(expr, Literal):
+        return str(expr.value)
+    if isinstance(expr, Grouping):
+        return f"(group {print_ast(expr.expr)})"
+    if isinstance(expr, Unary):
+        return f"({expr.op} {print_ast(expr.expr)})"
+    if isinstance(expr, Binary):
+        return f"({expr.op} {print_ast(expr.lexpr)} {print_ast(expr.rexpr)})"
+
+# expression     → equality ;
+# equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+# comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+# term           → factor ( ( "-" | "+" ) factor )* ;
+# factor         → unary ( ( "/" | "*" ) unary )* ;
+# unary          → ( "!" | "-" ) unary
+#                | primary ;
+# primary        → NUMBER | STRING | "true" | "false" | "nil"
+#                | "(" expression ")" ;
+
+
+class Parser:
+    def __init__(self, tokens: list[Token]) -> None:
+        self.tokens: list[Token] = tokens
+        self.current = 0
+
+    def peek(self) -> Token:
+        return self.tokens[self.current]
+
+    def advance(self) -> Token:
+        tok = self.peek()
+        self.current += 1
+        return tok
+
+    def expression(self) -> Expr:
+        return self.term()
+
+    def match(self, *types: str) -> Token | None:
+        kind = self.peek().type
+        if kind in types:
+            return self.advance()
+        return None
+
+    def term(self) -> Expr:
+        expr: Expr = self.primary()
+        while (token := self.match("PLUS", "MINUS")):
+            right = self.primary()
+            expr = Binary(expr, right, token.lexme)
+        return expr
+
+    def primary(self) -> Expr:
+        if token := self.match('TRUE', 'FALSE', 'NIL'):
+            return Literal(token.lexme)
+        elif token := self.match('NUMBER', 'STRING'):
+            return Literal(token.literal)
+        elif self.match('LEFT_PAREN'):
+            expr: Expr = self.expression()
+            return Grouping(expr)
+        raise SyntaxError("Expected literal or (expr)")
+
+    def parse(self) -> Expr:
+        return self.expression()
 
 
 def main() -> None:
