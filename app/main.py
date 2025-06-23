@@ -1,6 +1,7 @@
 import sys
 
 from enum import Enum, auto
+from parser import *
 
 
 class Err(Enum):
@@ -182,7 +183,13 @@ class Scanner:
         self.tokens.append(token)
 
 
-def main():
+def scan(file_contents: list[str]) -> Scanner:
+    s = Scanner(file_contents)
+    s.scan()
+    return s
+
+
+def main() -> None:
 
     if len(sys.argv) < 3:
         print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
@@ -191,22 +198,33 @@ def main():
     command = sys.argv[1]
     filename = sys.argv[2]
 
-    if command != "tokenize":
+    if command == "tokenize":
+        with open(filename) as file:
+            file_contents: list[str] = file.readlines()
+
+        if file_contents:
+            s = Scanner(file_contents)
+            s.scan()
+            for t in s.tokens:
+                t.display()
+            sys.exit(s.ret)
+        else:
+            # Placeholder, replace this line when implementing the scanner
+            print("EOF  null")
+    elif command == "parse":
+        with open(filename) as file:
+            file_contents: list[str] = file.readlines()
+
+        if file_contents:
+            s = Scanner(file_contents)
+            s.scan()
+            p = Parser(s.tokens)
+            ast = p.parse()
+            out = print_ast(ast)
+            print(out)
+    else:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
-
-    with open(filename) as file:
-        file_contents = file.readlines()
-
-    if file_contents:
-        s = Scanner(file_contents)
-        s.scan()
-        for t in s.tokens:
-            t.display()
-        sys.exit(s.ret)
-    else:
-        # Placeholder, replace this line when implementing the scanner
-        print("EOF  null")
 
 
 if __name__ == "__main__":
