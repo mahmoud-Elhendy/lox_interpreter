@@ -379,6 +379,8 @@ def evaluate(expression: Expr) -> Any:
         elif op == '-':
             if isinstance(expr, float):
                 return -expr
+            else:
+                raise RuntimeError('Operand must be a number.')
 # f(B(B(1+2)*B(5-3)))
 #  └──f(B(1+2)) * f(B(5-3))
 #           └── 3 * 2
@@ -450,6 +452,9 @@ def main() -> None:
             except SyntaxError as e:
                 print(e, file=sys.stderr)
                 sys.exit(65)
+            except RuntimeError as e:
+                print(e, file=sys.stderr)
+                sys.exit(70)
     elif command == "test":
         e = evaluate(Binary(Literal(5.0), Literal(2.0), '-'))
         print(e)
