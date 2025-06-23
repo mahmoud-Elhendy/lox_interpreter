@@ -353,6 +353,14 @@ def evaluate(expression: Expr) -> Any:
             return evaluate(left) * evaluate(right)
         if op == '/':
             return evaluate(left) / evaluate(right)
+        if op == '>':
+            return evaluate(left) > evaluate(right)
+        if op == '<':
+            return evaluate(left) < evaluate(right)
+        if op == '>=':
+            return evaluate(left) >= evaluate(right)
+        if op == '<=':
+            return evaluate(left) <= evaluate(right)
     elif isinstance(expression, Grouping):
         return evaluate(expression.expr)
     elif isinstance(expression, Unary):
