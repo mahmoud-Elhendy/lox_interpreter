@@ -12,10 +12,10 @@ class Err(Enum):
 
 
 class Token:
-    def __init__(self, type: str, lexme: str, literal: str, line: int, err: Err = Err.NONE) -> None:
+    def __init__(self, type: str, lexme: str, literal: Any, line: int, err: Err = Err.NONE) -> None:
         self.type: str = type
         self.lexme: str = lexme
-        self.literal: str = literal
+        self.literal: Any = literal
         self.line: int = line
         self.err: Err = err
 
@@ -83,7 +83,7 @@ class Scanner:
             char = 0
             while char < len(line):
                 type: str = ''
-                literal: str = ''
+                literal: Any = ''
                 err: Err = Err.NONE
                 token_str: str = line[char]
                 if token_str.isspace():
@@ -117,7 +117,7 @@ class Scanner:
                         char = len(line)  # end loop
                 elif token_str.isdigit():
                     type, token_str = self.scan_nums(line[char:])
-                    literal = str(float(token_str))
+                    literal = float(token_str)
                     char += len(token_str) - 1
                 elif self.is_id_start(token_str):
                     type, token_str = self.scan_id_keywords(line[char:])
@@ -174,7 +174,7 @@ class Scanner:
             i += 1
         return 'NUMBER', num
 
-    def tokenize(self, lexme: str, line: int, type: str = '', literal: str = '', err: Err = Err.NONE) -> Token:
+    def tokenize(self, lexme: str, line: int, type: str = '', literal: Any = '', err: Err = Err.NONE) -> Token:
         literal = literal if literal else 'null'
         if not type and lexme in self.lexmes:
             type = self.lexmes[lexme]
@@ -323,6 +323,29 @@ class Parser:
 
     def parse(self) -> Expr:
         return self.expression()
+# Evaluator
+
+
+def evaluate(expression: Expr) -> Any:
+    if isinstance(expression, Literal):
+        return (expression.value)
+
+    elif isinstance(expression, Binary):
+        op = expression.op
+        left = expression.lexpr
+        right = expression.rexpr
+        if op == '+':
+            return evaluate(left) + evaluate(right)
+        if op == '-':
+            return evaluate(left) - evaluate(right)
+        if op == '*':
+            return evaluate(left) * evaluate(right)
+        if op == '/':
+            return evaluate(left) / evaluate(right)
+
+# f(B(B(1+2)*B(5-3)))
+#  └──f(B(1+2)) * f(B(5-3))
+#           └── 3 * 2
 
 
 def main() -> None:
@@ -362,6 +385,23 @@ def main() -> None:
                 sys.exit(65)
             out = print_ast(ast)
             print(out)
+    elif command == "evaluate":
+        with open(filename) as file:
+            file_contents: list[str] = file.readlines()
+
+        if file_contents:
+            s = Scanner(file_contents)
+            s.scan()
+            p = Parser(s.tokens)
+            try:
+                ast: Expr = p.parse()
+                print(evaluate(ast))
+            except SyntaxError as e:
+                print(e, file=sys.stderr)
+                sys.exit(65)
+    elif command == "test":
+        e = evaluate(Binary(Literal(5.0), Literal(2.0), '-'))
+        print(e)
     else:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
