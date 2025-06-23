@@ -233,7 +233,12 @@ class Binary(Expr):
 
 def print_ast(expr: Expr) -> str | None:
     if isinstance(expr, Literal):
-        return str(expr.value)
+        value: Any
+        if isinstance(expr.value, bool):
+            value = 'true' if expr.value else 'false'
+        else:
+            value = expr.value
+        return str(value)
     if isinstance(expr, Grouping):
         return f"(group {print_ast(expr.expr)})"
     if isinstance(expr, Unary):
