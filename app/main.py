@@ -342,7 +342,8 @@ def evaluate(expression: Expr) -> Any:
             return evaluate(left) * evaluate(right)
         if op == '/':
             return evaluate(left) / evaluate(right)
-
+    elif isinstance(expression, Grouping):
+        return evaluate(expression.expr)
 # f(B(B(1+2)*B(5-3)))
 #  └──f(B(1+2)) * f(B(5-3))
 #           └── 3 * 2
