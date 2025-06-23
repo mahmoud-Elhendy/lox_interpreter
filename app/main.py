@@ -234,7 +234,9 @@ class Binary(Expr):
 def print_ast(expr: Expr) -> str | None:
     if isinstance(expr, Literal):
         value: Any
-        if isinstance(expr.value, bool):
+        if expr.value is None:
+            value = 'nil'
+        elif isinstance(expr.value, bool):
             value = 'true' if expr.value else 'false'
         else:
             value = expr.value
