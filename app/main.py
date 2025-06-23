@@ -395,7 +395,13 @@ def main() -> None:
             p = Parser(s.tokens)
             try:
                 ast: Expr = p.parse()
-                print(str(evaluate(ast)))
+                out = evaluate(ast)
+                if isinstance(out, float):
+                    if out.is_integer():
+                        out = str(int(out))
+                    else:
+                        out = str(out)
+                print(out)
             except SyntaxError as e:
                 print(e, file=sys.stderr)
                 sys.exit(65)
