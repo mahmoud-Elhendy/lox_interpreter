@@ -422,6 +422,8 @@ def main() -> None:
                         out = str(int(out))
                     else:
                         out = str(out)
+                elif isinstance(out, bool):
+                    out = 'true' if out else 'false'
                 print(out)
             except SyntaxError as e:
                 print(e, file=sys.stderr)
