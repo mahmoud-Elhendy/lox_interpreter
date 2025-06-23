@@ -343,28 +343,31 @@ def evaluate(expression: Expr) -> Any:
 
     elif isinstance(expression, Binary):
         op: str = expression.op
-        left: Expr = expression.lexpr
-        right: Expr = expression.rexpr
-        if op == '+':
-            return evaluate(left) + evaluate(right)
-        if op == '-':
-            return evaluate(left) - evaluate(right)
-        if op == '*':
-            return evaluate(left) * evaluate(right)
-        if op == '/':
-            return evaluate(left) / evaluate(right)
-        if op == '>':
-            return evaluate(left) > evaluate(right)
-        if op == '<':
-            return evaluate(left) < evaluate(right)
-        if op == '>=':
-            return evaluate(left) >= evaluate(right)
-        if op == '<=':
-            return evaluate(left) <= evaluate(right)
+        left = evaluate(expression.lexpr)
+        right = evaluate(expression.rexpr)
         if op == '==':
-            return evaluate(left) == evaluate(right)
+            return left == right
         if op == '!=':
-            return evaluate(left) != evaluate(right)
+            return left != right
+        if isinstance(left, float) and isinstance(right, float):
+            if op == '+':
+                return left + right
+            if op == '-':
+                return left - right
+            if op == '*':
+                return left * right
+            if op == '/':
+                return left / right
+            if op == '>':
+                return left > right
+            if op == '<':
+                return left < right
+            if op == '>=':
+                return left >= right
+            if op == '<=':
+                return left <= right
+        else:
+            raise RuntimeError('Operands must be numbers.')
     elif isinstance(expression, Grouping):
         return evaluate(expression.expr)
     elif isinstance(expression, Unary):
@@ -438,6 +441,7 @@ def main() -> None:
             try:
                 ast: Expr = p.parse()
                 out = evaluate(ast)
+                # TODO fun to handle stdout of evaluate
                 if isinstance(out, float):
                     if out.is_integer():
                         out = str(int(out))
