@@ -395,7 +395,7 @@ def main() -> None:
             p = Parser(s.tokens)
             try:
                 ast: Expr = p.parse()
-                print(evaluate(ast))
+                print(str(evaluate(ast)))
             except SyntaxError as e:
                 print(e, file=sys.stderr)
                 sys.exit(65)
