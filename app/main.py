@@ -315,6 +315,7 @@ class Parser:
             return Literal(token.literal)
         elif self.match('LEFT_PAREN'):
             expr: Expr = self.expression()
+            self.match('RIGHT_PAREN')
             return Grouping(expr)
         raise SyntaxError("Expected literal or (expr)")
 
