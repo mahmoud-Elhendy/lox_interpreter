@@ -1,1 +1,1 @@
-print 12.0;
+print "non-ascii: ॐ";

@@ -475,7 +475,7 @@ def main() -> None:
     filename = sys.argv[2]
 
     if command == "tokenize":
-        with open(filename) as file:
+        with open(filename, encoding="utf-8") as file:
             file_contents: list[str] = file.readlines()
 
         if file_contents:
@@ -488,7 +488,7 @@ def main() -> None:
             # Placeholder, replace this line when implementing the scanner
             print("EOF  null")
     elif command == "parse":
-        with open(filename) as file:
+        with open(filename, encoding="utf-8") as file:
             file_contents: list[str] = file.readlines()
 
         if file_contents:
@@ -504,7 +504,7 @@ def main() -> None:
                 sys.exit(65)
 
     elif command == "evaluate":
-        with open(filename) as file:
+        with open(filename, encoding="utf-8") as file:
             file_contents: list[str] = file.readlines()
 
         if file_contents:
@@ -524,7 +524,7 @@ def main() -> None:
                 print(e, file=sys.stderr)
                 sys.exit(70)
     elif command == "run":
-        with open(filename) as file:
+        with open(filename, encoding="utf-8") as file:
             file_contents: list[str] = file.readlines()
 
         if file_contents:
