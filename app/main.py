@@ -385,7 +385,13 @@ class Interpreter():
             print(self.stringfy(stmt.expr))
 
     def stringfy(self, expr: Expr) -> str:
-        return str(evaluate(expr))
+        out = evaluate(expr)
+        if out is None:
+            out = 'nil'
+        if isinstance(out, bool):
+            out = 'true' if out else 'false'
+
+        return str(out)
 
 
 def evaluate(expression: Expr) -> Any:
