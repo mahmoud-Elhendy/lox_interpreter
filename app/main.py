@@ -231,6 +231,15 @@ class Binary(Expr):
     op: str
 
 
+class Stmt():
+    pass
+
+
+@dataclass
+class PrintStmt(Stmt):
+    expr: Expr
+
+
 def print_ast(expr: Expr) -> str | None:
     if isinstance(expr, Literal):
         value: Any
@@ -248,6 +257,8 @@ def print_ast(expr: Expr) -> str | None:
     if isinstance(expr, Binary):
         return f"({expr.op} {print_ast(expr.lexpr)} {print_ast(expr.rexpr)})"
 
+# statment       → printStmt
+# printStmt      → "print" expression ";"
 # expression     → equality ;
 # equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 # comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
@@ -277,6 +288,31 @@ class Parser:
         if kind in types:
             return self.advance()
         return None
+
+    def check(self, type: str) -> bool:
+        kind = self.peek().type
+        if kind == type:
+            return True
+        return False
+
+    def consume(self, type: str, expected: str) -> None:
+        if self.check(type):
+            self.advance()
+        else:
+            raise SyntaxError(expected)
+
+    def at_end(self) -> bool:
+        return self.peek().type == 'EOF'
+
+    def statment(self) -> Stmt:
+        if self.match('PRINT'):
+            return self.printstatment()
+        raise SyntaxError('Unsupported statment')  # TODO fix
+
+    def printstatment(self) -> Stmt:
+        expr = self.expression()
+        self.consume('SEMICOLON', 'Statment missing ;')
+        return PrintStmt(expr)
 
     def expression(self) -> Expr:
         return self.equality()
@@ -332,9 +368,24 @@ class Parser:
         raise SyntaxError(
             f"[line {token.line}] Error at '{token.lexme}': Expect expression.")
 
-    def parse(self) -> Expr:
+    def parse(self) -> list[Stmt]:
+        statments: list[Stmt] = []
+        while not self.at_end():
+            statments.append(self.statment())
+        return statments
+
+    def parse_expr(self) -> Expr:
         return self.expression()
 # Evaluator
+
+
+class Interpreter():
+    def exec(self, stmt: Stmt) -> None:
+        if isinstance(stmt, PrintStmt):
+            print(self.stringfy(stmt.expr))
+
+    def stringfy(self, expr: Expr) -> str:
+        return str(evaluate(expr))
 
 
 def evaluate(expression: Expr) -> Any:
@@ -427,12 +478,13 @@ def main() -> None:
             s.scan()
             p = Parser(s.tokens)
             try:
-                ast = p.parse()
+                ast = p.parse_expr()
+                out = print_ast(ast)
+                print(out)
             except SyntaxError as e:
                 print(e, file=sys.stderr)
                 sys.exit(65)
-            out = print_ast(ast)
-            print(out)
+
     elif command == "evaluate":
         with open(filename) as file:
             file_contents: list[str] = file.readlines()
@@ -442,7 +494,7 @@ def main() -> None:
             s.scan()
             p = Parser(s.tokens)
             try:
-                ast: Expr = p.parse()
+                ast: Expr = p.parse_expr()
                 out = evaluate(ast)
                 # TODO fun to handle stdout of evaluate
                 if isinstance(out, float):
@@ -462,6 +514,23 @@ def main() -> None:
             except RuntimeError as e:
                 print(e, file=sys.stderr)
                 sys.exit(70)
+    elif command == "run":
+        with open(filename) as file:
+            file_contents: list[str] = file.readlines()
+
+        if file_contents:
+            s = Scanner(file_contents)
+            s.scan()
+            p = Parser(s.tokens)
+            try:
+                stms = p.parse()
+                interpreter = Interpreter()
+                for stmt in stms:
+                    interpreter.exec(stmt)
+            except SyntaxError as e:
+                print(e, file=sys.stderr)
+                sys.exit(70)
+
     elif command == "test":
         e = evaluate(Binary(Literal(5.0), Literal(2.0), '-'))
         print(e)
