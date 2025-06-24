@@ -532,13 +532,13 @@ def main() -> None:
             s.scan()
             p = Parser(s.tokens)
             try:
-                stms = p.parse()
+                stms: list[Stmt] = p.parse()
                 interpreter = Interpreter()
                 for stmt in stms:
                     interpreter.exec(stmt)
             except SyntaxError as e:
                 print(e, file=sys.stderr)
-                sys.exit(70)
+                sys.exit(65)
     else:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
