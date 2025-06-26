@@ -118,7 +118,7 @@ class Scanner:
                 else:
                     self.ret = 65
                     err = Err.UNTERMINATED_STRING
-                    break
+                    char = len(self.content)
             elif token_str.isdigit():
                 type, token_str = self.scan_nums(self.content[char:])
                 literal = float(token_str)
@@ -136,7 +136,13 @@ class Scanner:
         self.add_token(Token('EOF', '', 'null', self.line_number + 1))
 
     def scan_string_literals(self, line: str) -> tuple[str, str] | None:
-        end: int = line.find('"')
+        end = -1
+        for i, c in enumerate(line):
+            if c == '\n':
+                self.line_number += 1
+            elif c == '"':
+                end = i
+                break
         if end != -1:
             return ('STRING', line[:end])
         else:
@@ -523,7 +529,7 @@ def main() -> None:
                 sys.exit(70)
     elif command == "run":
         with open(filename, encoding="utf-8") as file:
-            file_contents = file.read()
+            file_contents: str = file.read()
 
         if file_contents:
             s = Scanner(file_contents)
