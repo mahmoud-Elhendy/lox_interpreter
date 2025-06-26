@@ -107,9 +107,11 @@ class Scanner:
                     token_str += self.content[char]
             # handle comments
             elif token_str == '/' and char + 1 < len(self.content) and self.content[char + 1] == '/':
+
                 # // comment -> skip the rest of line
-                if i := self.content[char + 1].find('\n') >= 0:
-                    char += i
+                if (i := self.content[char + 1:].find('\n')) >= 0:
+                    char += i + 1
+                    continue
             elif token_str == '"':
                 if (ret := self.scan_string_literals(self.content[char+1:])):
                     type, literal = ret

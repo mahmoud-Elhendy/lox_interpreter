@@ -1,0 +1,4 @@
+//cd dfrgf3g
+print "world" + "quz" + "baz";
+print 86 - 36;
+print "baz" == "foo";
