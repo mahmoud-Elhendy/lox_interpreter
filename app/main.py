@@ -34,10 +34,10 @@ class Token:
 
 
 class Scanner:
-    def __init__(self, content: list[str]) -> None:
-        self.content: list[str] = content
+    def __init__(self, content: str) -> None:
+        self.content: str = content
         self.tokens: list[Token] = list()
-        self.line: int = 0
+        self.line_number: int = 0
         self.lexmes: dict[str, str] = {
             '(': 'LEFT_PAREN',
             ')': 'RIGHT_PAREN',
@@ -78,58 +78,62 @@ class Scanner:
         self.ret: int = 0
 
     def scan(self) -> None:
-        for line in self.content:
-            self.line += 1
-            char = 0
-            while char < len(line):
-                type: str = ''
-                literal: Any = ''
-                err: Err = Err.NONE
-                token_str: str = line[char]
-                if token_str.isspace():
-                    char += 1
-                    continue
-                # handle operators
-                if token_str == '=' and char + 1 < len(line):
-                    if line[char + 1] == '=':
-                        char += 1
-                        token_str += line[char]
-                elif token_str == '!' and char + 1 < len(line):
-                    if line[char + 1] == '=':
-                        char += 1
-                        token_str += line[char]
-                elif (token_str == '>' or token_str == '<') and char + 1 < len(line):
-                    if line[char + 1] == '=':
-                        char += 1
-                        token_str += line[char]
-                # handle comments
-                elif token_str == '/' and char + 1 < len(line) and line[char + 1] == '/':
-                    # // comment -> skip the rest of line
-                    break
-                elif token_str == '"':
-                    if (ret := self.scan_string_literals(line[char+1:])):
-                        type, literal = ret
-                        token_str = f'"{literal}"'
-                        char += len(literal) + 1
-                    else:
-                        self.ret = 65
-                        err = Err.UNTERMINATED_STRING
-                        char = len(line)  # end loop
-                elif token_str.isdigit():
-                    type, token_str = self.scan_nums(line[char:])
-                    literal = float(token_str)
-                    char += len(token_str) - 1
-                elif self.is_id_start(token_str):
-                    type, token_str = self.scan_id_keywords(line[char:])
-                    char += len(token_str) - 1
-                elif token_str not in self.lexmes:
-                    self.ret = 65
-                    err = Err.UNEXPECTED_CHAR
-
-                self.add_token(self.tokenize(
-                    token_str, self.line, type=type, literal=literal, err=err))
+        self.line_number += 1
+        char = 0
+        while char < len(self.content):
+            type: str = ''
+            literal: Any = ''
+            err: Err = Err.NONE
+            token_str: str = self.content[char]
+            if token_str == '\n':
                 char += 1
-        self.add_token(Token('EOF', '', 'null', self.line + 1))
+                self.line_number += 1
+                continue
+            if token_str.isspace():
+                char += 1
+                continue
+            # handle operators
+            if token_str == '=' and char + 1 < len(self.content):
+                if self.content[char + 1] == '=':
+                    char += 1
+                    token_str += self.content[char]
+            elif token_str == '!' and char + 1 < len(self.content):
+                if self.content[char + 1] == '=':
+                    char += 1
+                    token_str += self.content[char]
+            elif (token_str == '>' or token_str == '<') and char + 1 < len(self.content):
+                if self.content[char + 1] == '=':
+                    char += 1
+                    token_str += self.content[char]
+            # handle comments
+            elif token_str == '/' and char + 1 < len(self.content) and self.content[char + 1] == '/':
+                # // comment -> skip the rest of line
+                if i := self.content[char + 1].find('\n') >= 0:
+                    char += i
+            elif token_str == '"':
+                if (ret := self.scan_string_literals(self.content[char+1:])):
+                    type, literal = ret
+                    token_str = f'"{literal}"'
+                    char += len(literal) + 1
+                else:
+                    self.ret = 65
+                    err = Err.UNTERMINATED_STRING
+                    break
+            elif token_str.isdigit():
+                type, token_str = self.scan_nums(self.content[char:])
+                literal = float(token_str)
+                char += len(token_str) - 1
+            elif self.is_id_start(token_str):
+                type, token_str = self.scan_id_keywords(self.content[char:])
+                char += len(token_str) - 1
+            elif token_str not in self.lexmes:
+                self.ret = 65
+                err = Err.UNEXPECTED_CHAR
+
+            self.add_token(self.tokenize(
+                token_str, self.line_number, type=type, literal=literal, err=err))
+            char += 1
+        self.add_token(Token('EOF', '', 'null', self.line_number + 1))
 
     def scan_string_literals(self, line: str) -> tuple[str, str] | None:
         end: int = line.find('"')
@@ -182,12 +186,6 @@ class Scanner:
 
     def add_token(self, token: Token) -> None:
         self.tokens.append(token)
-
-
-def scan(file_contents: list[str]) -> Scanner:
-    s = Scanner(file_contents)
-    s.scan()
-    return s
 
 # expression     → literal
 #                | unary
@@ -476,7 +474,7 @@ def main() -> None:
 
     if command == "tokenize":
         with open(filename, encoding="utf-8") as file:
-            file_contents: list[str] = file.readlines()
+            file_contents = file.read()
 
         if file_contents:
             s = Scanner(file_contents)
@@ -489,7 +487,7 @@ def main() -> None:
             print("EOF  null")
     elif command == "parse":
         with open(filename, encoding="utf-8") as file:
-            file_contents: list[str] = file.readlines()
+            file_contents = file.read()
 
         if file_contents:
             s = Scanner(file_contents)
@@ -505,7 +503,7 @@ def main() -> None:
 
     elif command == "evaluate":
         with open(filename, encoding="utf-8") as file:
-            file_contents: list[str] = file.readlines()
+            file_contents = file.read()
 
         if file_contents:
             s = Scanner(file_contents)
@@ -525,7 +523,7 @@ def main() -> None:
                 sys.exit(70)
     elif command == "run":
         with open(filename, encoding="utf-8") as file:
-            file_contents: list[str] = file.readlines()
+            file_contents = file.read()
 
         if file_contents:
             s = Scanner(file_contents)
