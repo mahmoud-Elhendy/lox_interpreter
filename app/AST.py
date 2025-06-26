@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from typing import Any
+
 # expression     → literal
 #                | unary
 #                | binary
@@ -11,9 +14,6 @@
 #                | "+"  | "-"  | "*" | "/" ;
 
 # Note: Literal is an expression but op not expression
-
-from dataclasses import dataclass
-from typing import Any
 
 
 class Expr:
@@ -43,9 +43,25 @@ class Binary(Expr):
     op: str
 
 
+class Stmt():
+    pass
+
+
+@dataclass
+class PrintStmt(Stmt):
+    expr: Expr
+
+
 def print_ast(expr: Expr) -> str | None:
     if isinstance(expr, Literal):
-        return str(expr.value)
+        value: Any
+        if expr.value is None:
+            value = 'nil'
+        elif isinstance(expr.value, bool):
+            value = 'true' if expr.value else 'false'
+        else:
+            value = expr.value
+        return str(value)
     if isinstance(expr, Grouping):
         return f"(group {print_ast(expr.expr)})"
     if isinstance(expr, Unary):
