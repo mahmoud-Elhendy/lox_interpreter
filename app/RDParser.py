@@ -1,5 +1,5 @@
-from AST import *
-from scanner import Token
+from app.AST import *
+from app.scanner import Token
 
 # statment       → printStmt
 # printStmt      → "print" expression ";"
