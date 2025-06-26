@@ -82,7 +82,7 @@ class Scanner:
         char = 0
         while char < len(self.content):
             type: str = ''
-            literal: Any = ''
+            literal: Any = None
             err: Err = Err.NONE
             token_str: str = self.content[char]
             if token_str == '\n':
@@ -186,8 +186,8 @@ class Scanner:
             i += 1
         return 'NUMBER', num
 
-    def tokenize(self, lexme: str, line: int, type: str = '', literal: Any = '', err: Err = Err.NONE) -> Token:
-        literal = literal if literal != '' else 'null'
+    def tokenize(self, lexme: str, line: int, type: str = '', literal: Any = None, err: Err = Err.NONE) -> Token:
+        literal = literal if literal != None else 'null'
         if not type and lexme in self.lexmes:
             type = self.lexmes[lexme]
         return Token(type, lexme, literal, line, err=err)
