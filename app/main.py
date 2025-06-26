@@ -1,10 +1,10 @@
 import sys
 
 from app.scanner import Scanner
-from RDParser import Parser
-from evaluator import Evaluator
-from interpreter import Interpreter
-from AST import *
+from app.RDParser import Parser
+from app.evaluator import Evaluator
+from app.interpreter import Interpreter
+from app.AST import *
 
 
 # Evaluator
