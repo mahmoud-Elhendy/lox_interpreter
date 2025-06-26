@@ -112,6 +112,9 @@ class Scanner:
                 if (i := self.content[char + 1:].find('\n')) >= 0:
                     char += i + 1
                     continue
+                else:  # the file itself is a comment
+                    break
+
             elif token_str == '"':
                 if (ret := self.scan_string_literals(self.content[char+1:])):
                     type, literal = ret
@@ -135,6 +138,7 @@ class Scanner:
             self.add_token(self.tokenize(
                 token_str, self.line_number, type=type, literal=literal, err=err))
             char += 1
+
         self.add_token(Token('EOF', '', 'null', self.line_number + 1))
 
     def scan_string_literals(self, line: str) -> tuple[str, str] | None:
