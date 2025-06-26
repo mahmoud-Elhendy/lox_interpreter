@@ -1,6 +1,6 @@
 import sys
 
-from scanner import Scanner
+from app.scanner import Scanner
 from RDParser import Parser
 from evaluator import Evaluator
 from interpreter import Interpreter
