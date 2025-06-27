@@ -31,6 +31,12 @@ class Variable(Expr):
 
 
 @dataclass
+class Assign(Expr):
+    name: str
+    expr: Expr
+
+
+@dataclass
 class Grouping(Expr):
     expr: Expr
 

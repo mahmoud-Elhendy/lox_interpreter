@@ -66,6 +66,11 @@ class Evaluator:
                     raise RuntimeError('Operand must be a number.')
         elif isinstance(expression, Variable):
             return self.env.get(expression.name)
+        elif isinstance(expression, Assign):
+            name = expression.name
+            value = self.evaluate(expression.expr)
+            self.env.put(name, value)
+            return value
 
     def stringfy(self, out: Any) -> str:
         if isinstance(out, float):

@@ -1,1 +1,5 @@
-(foo
+var a;
+var c;
+a =c= 4 ;
+print a ;
+print c+3;

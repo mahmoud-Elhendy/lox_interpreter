@@ -2,20 +2,30 @@ from app.AST import *
 from app.AST import Expr
 from app.scanner import Token
 
-# program        → declaration * EOF ;
+# program        → declaration* EOF ;
+
 # declaration    → varDecl | statement ;
-# statment       → printStmt | exprStmt
-# printStmt      → "print" expression ";"
-# exprStmt       → expression ";"
-# expression     → equality ;
+
+# statement      → printStmt | exprStmt ;
+
+# printStmt      → "print" expression ";" ;
+# exprStmt       → expression ";" ;
+# varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+
+# expression     → assignment ;
+
+# assignment     → IDENTIFIER "=" assignment
+#                | equality ;
+
 # equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 # comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 # term           → factor ( ( "-" | "+" ) factor )* ;
 # factor         → unary ( ( "/" | "*" ) unary )* ;
 # unary          → ( "!" | "-" ) unary
 #                | primary ;
+
 # primary        → NUMBER | STRING | "true" | "false" | "nil"
-#                | "(" expression ")"| IDENTIFIER ;
+#                | "(" expression ")" | IDENTIFIER ;
 
 
 class Parser:
@@ -87,39 +97,49 @@ class Parser:
         return PrintStmt(expr)
 
     def expression(self) -> Expr:
-        return self.equality()
+        return self.assignment()
+
+    def assignment(self) -> Expr:
+        expr: Expr = self.equality()
+        if self.match('EQUAL'):
+            value: Expr = self.assignment()
+            if isinstance(expr, Variable):
+                return Assign(expr.name, value)
+            else:
+                raise SyntaxError("Invalid assignment target.")
+        return expr
 
     def equality(self) -> Expr:
-        expr = self.comparison()
+        expr: Expr = self.comparison()
         while (token := self.match("BANG_EQUAL", "EQUAL_EQUAL")):
-            right = self.comparison()
+            right: Expr = self.comparison()
             expr = Binary(expr, right, token.lexme)
         return expr
 
     def comparison(self) -> Expr:
-        expr = self.term()
+        expr: Expr = self.term()
         while (token := self.match("LESS_EQUAL", "GREATER_EQUAL", "LESS", "GREATER")):
-            right = self.term()
+            right: Expr = self.term()
             expr = Binary(expr, right, token.lexme)
         return expr
 
     def term(self) -> Expr:
         expr: Expr = self.factor()
         while (token := self.match("PLUS", "MINUS")):
-            right = self.factor()
+            right: Expr = self.factor()
             expr = Binary(expr, right, token.lexme)
         return expr
 
     def factor(self) -> Expr:
         expr: Expr = self.unary()
         while (token := self.match("SLASH", "STAR")):
-            right = self.unary()
+            right: Expr = self.unary()
             expr = Binary(expr, right, token.lexme)
         return expr
 
     def unary(self) -> Expr:
         if token := self.match("BANG", "MINUS"):
-            right = self.unary()
+            right: Expr = self.unary()
             return Unary(token.lexme, right)
         return self.primary()
 
