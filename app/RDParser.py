@@ -1,6 +1,9 @@
 from app.AST import *
+from app.AST import Expr
 from app.scanner import Token
 
+# program        → declaration * EOF ;
+# declaration    → varDecl | statement ;
 # statment       → printStmt | exprStmt
 # printStmt      → "print" expression ";"
 # exprStmt       → expression ";"
@@ -12,7 +15,7 @@ from app.scanner import Token
 # unary          → ( "!" | "-" ) unary
 #                | primary ;
 # primary        → NUMBER | STRING | "true" | "false" | "nil"
-#                | "(" expression ")" ;
+#                | "(" expression ")"| IDENTIFIER ;
 
 
 class Parser:
@@ -48,6 +51,24 @@ class Parser:
 
     def at_end(self) -> bool:
         return self.peek().type == 'EOF'
+
+    def decl(self) -> Stmt:
+        if self.match('VAR'):
+            return self.vardecl()
+        else:
+            return self.statment()
+
+    def vardecl(self) -> Stmt:
+        if token := self.match('IDENTIFIER'):
+            expr = None
+            if self.match('EQUAL'):
+                expr = self.expression()
+            self.consume('SEMICOLON', 'Missing ;')
+            return Decl(token.lexme, expr)
+        else:
+            token = self.peek()
+            raise SyntaxError(
+                f'[line {token.line}]: Expected Identifier after var')
 
     def statment(self) -> Stmt:
         if self.match('PRINT'):
@@ -115,6 +136,9 @@ class Parser:
             expr: Expr = self.expression()
             self.match('RIGHT_PAREN')
             return Grouping(expr)
+        elif token := self.match('IDENTIFIER'):
+            return Variable(token.lexme)
+
         token = self.peek()
         raise SyntaxError(
             f"[line {token.line}] Error at '{token.lexme}': Expect expression.")
@@ -122,7 +146,7 @@ class Parser:
     def parse(self) -> list[Stmt]:
         statments: list[Stmt] = []
         while not self.at_end():
-            statments.append(self.statment())
+            statments.append(self.decl())
         return statments
 
     def parse_expr(self) -> Expr:

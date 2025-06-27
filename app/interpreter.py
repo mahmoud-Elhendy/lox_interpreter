@@ -17,6 +17,13 @@ class Interpreter():
             print(self.stringfy(stmt.expr))
         elif isinstance(stmt, ExprStmt):
             self.evaluator.evaluate(stmt.expr)
+        if isinstance(stmt, Decl):
+            if stmt.expr:
+                value = self.evaluator.evaluate(stmt.expr)
+            else:
+                value = None
+            # TODO may be impl singlton instead
+            self.evaluator.env.put(stmt.name, value)
 
     def stringfy(self, expr: Expr) -> str:
         out = self.evaluator.evaluate(expr)

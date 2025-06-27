@@ -26,6 +26,11 @@ class Literal(Expr):
 
 
 @dataclass
+class Variable(Expr):
+    name: str
+
+
+@dataclass
 class Grouping(Expr):
     expr: Expr
 
@@ -55,6 +60,12 @@ class PrintStmt(Stmt):
 @dataclass
 class ExprStmt(Stmt):
     expr: Expr
+
+
+@dataclass
+class Decl(Stmt):
+    name: str
+    expr: Expr | None
 
 
 def print_ast(expr: Expr) -> str | None:

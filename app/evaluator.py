@@ -1,8 +1,11 @@
 from typing import Any
 from app.AST import *
+from app.env import Env
 
 
 class Evaluator:
+    def __init__(self) -> None:
+        self.env = Env()
     # f(B(B(1+2)*B(5-3)))
     #  └──f(B(1+2)) * f(B(5-3))
     #           └── 3 * 2
@@ -61,6 +64,8 @@ class Evaluator:
                     return -expr
                 else:
                     raise RuntimeError('Operand must be a number.')
+        elif isinstance(expression, Variable):
+            return self.env.get(expression.name)
 
     def stringfy(self, out: Any) -> str:
         if isinstance(out, float):

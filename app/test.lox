@@ -1,1 +1,4 @@
-49 + "baz";
+var a = 2 + 4;
+print a;
+var c = "sddd";
+print c;
