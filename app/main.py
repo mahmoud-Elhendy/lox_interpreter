@@ -82,7 +82,7 @@ def main() -> None:
             try:
                 interpreter.interpret()
             except RuntimeError as e:
-                print(e)
+                print(e, file=sys.stderr)
                 sys.exit(70)
     else:
         print(f"Unknown command: {command}", file=sys.stderr)
