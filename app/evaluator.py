@@ -26,7 +26,8 @@ class Evaluator:
                 if type(left) is type(right):
                     return left + right
                 else:
-                    raise RuntimeError('Operands must have the same types.')
+                    raise RuntimeError(
+                        'Operands must be two numbers or two strings.')
             if isinstance(left, float) and isinstance(right, float):
                 if op == '-':
                     return left - right

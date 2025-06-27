@@ -1,8 +1,9 @@
 from app.AST import *
 from app.scanner import Token
 
-# statment       → printStmt
+# statment       → printStmt | exprStmt
 # printStmt      → "print" expression ";"
+# exprStmt       → expression ";"
 # expression     → equality ;
 # equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 # comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
@@ -51,7 +52,13 @@ class Parser:
     def statment(self) -> Stmt:
         if self.match('PRINT'):
             return self.printstatment()
-        raise SyntaxError('Unsupported statment')  # TODO fix
+        else:
+            return self.exprstatment()
+
+    def exprstatment(self) -> Stmt:
+        expr = self.expression()
+        self.consume('SEMICOLON', 'Statment missing ;')
+        return ExprStmt(expr)
 
     def printstatment(self) -> Stmt:
         expr = self.expression()

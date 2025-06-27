@@ -7,9 +7,6 @@ from app.interpreter import Interpreter
 from app.AST import *
 
 
-# Evaluator
-
-
 def main() -> None:
 
     if len(sys.argv) < 3:
@@ -78,12 +75,11 @@ def main() -> None:
             p = Parser(s.tokens)
             try:
                 stms: list[Stmt] = p.parse()
-                interpreter = Interpreter()
-                for stmt in stms:
-                    interpreter.exec(stmt)
             except SyntaxError as e:
                 print(e, file=sys.stderr)
                 sys.exit(65)
+            interpreter = Interpreter(stms)
+            interpreter.interpret()
     else:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)

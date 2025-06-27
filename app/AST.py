@@ -52,6 +52,11 @@ class PrintStmt(Stmt):
     expr: Expr
 
 
+@dataclass
+class ExprStmt(Stmt):
+    expr: Expr
+
+
 def print_ast(expr: Expr) -> str | None:
     if isinstance(expr, Literal):
         value: Any
