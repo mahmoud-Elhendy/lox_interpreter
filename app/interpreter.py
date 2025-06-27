@@ -10,11 +10,7 @@ class Interpreter():
 
     def interpret(self) -> None:
         for stmt in self.stmts:
-            try:
-                self.exec(stmt)
-            except RuntimeError as e:
-                print(e)
-                break
+            self.exec(stmt)
 
     def exec(self, stmt: Stmt) -> None:
         if isinstance(stmt, PrintStmt):

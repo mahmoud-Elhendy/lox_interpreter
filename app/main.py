@@ -79,7 +79,11 @@ def main() -> None:
                 print(e, file=sys.stderr)
                 sys.exit(65)
             interpreter = Interpreter(stms)
-            interpreter.interpret()
+            try:
+                interpreter.interpret()
+            except RuntimeError as e:
+                print(e)
+                sys.exit(70)
     else:
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
