@@ -134,7 +134,7 @@ class Parser:
             return Literal(token.literal)
         elif self.match('LEFT_PAREN'):
             expr: Expr = self.expression()
-            self.match('RIGHT_PAREN')
+            self.consume('RIGHT_PAREN', 'Expected )')
             return Grouping(expr)
         elif token := self.match('IDENTIFIER'):
             return Variable(token.lexme)
