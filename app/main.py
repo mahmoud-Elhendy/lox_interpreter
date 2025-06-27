@@ -78,7 +78,6 @@ def main() -> None:
             except SyntaxError as e:
                 print(e, file=sys.stderr)
                 sys.exit(65)
-            print(stms)
             interpreter = Interpreter(stms)
             try:
                 interpreter.interpret()
